@@ -6,37 +6,49 @@ import com.sparta.myselectshop.dto.ProductResponseDto;
 import com.sparta.myselectshop.entity.Product;
 import com.sparta.myselectshop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
 
-    public ProductResponseDto createProduct(ProductRequestDto requestDto) throws SQLException {
+    @Transactional
+    public ProductResponseDto createProduct(ProductRequestDto requestDto) {
         // 요청받은 DTO 로 DB에 저장할 객체 만들기
-        Product product = new Product(requestDto);
-
-        return  productRepository.createProduct(product);
+        Product product = productRepository.saveAndFlush(new Product(requestDto));
+        // saveAndFlush 는 영속성 컨텍스트에 담겼다가 저장하는게 아니라 곧바로 DB 에 insert 한다고 이해
+        return new ProductResponseDto(product);
     }
 
-    public List<ProductResponseDto> getProducts() throws SQLException {
+    @Transactional(readOnly = true)
+    public List<ProductResponseDto> getProducts() {
 
-        return productRepository.getProducts();
-    }
+        List<ProductResponseDto> list = new ArrayList<>();
 
-    public Long updateProduct(Long id, ProductMypriceRequestDto requestDto) throws SQLException {
-        Product product = productRepository.getProduct(id);
-
-        if(product == null) {
-            throw new NullPointerException("해당 상품은 존재하지 않습니다.");
+        List<Product> productList = productRepository.findAll();
+        for (Product product : productList) {
+            list.add(new ProductResponseDto(product));
         }
 
-        return productRepository.updateProduct(product.getId(), requestDto);
+        return list;
+    }
+
+    @Transactional
+    public Long updateProduct(Long id, ProductMypriceRequestDto requestDto) {
+
+        Product product = productRepository.findById(id).orElseThrow(
+                () -> new NullPointerException("해당 상품은 존재하지 않습니다.")
+        );
+
+        product.update(requestDto);
+
+        return product.getId();
     }
 
 }
