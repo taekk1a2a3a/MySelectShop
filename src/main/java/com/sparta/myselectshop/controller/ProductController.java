@@ -13,10 +13,16 @@ import java.util.List;
 @RequestMapping("/api")
 public class ProductController {
 
+    // 멤버 변수 선언 (객체 중복 생성 코드 정리)
+    private final ProductService productService;
+
+    public ProductController() {
+        this.productService =  new ProductService();
+    }
+
     // 관심 상품 등록하기
     @PostMapping("/products")
     public ProductResponseDto createProduct(@RequestBody ProductRequestDto requestDto) throws SQLException {
-        ProductService productService = new ProductService();
         // 응답 보내기
         return productService.createProduct(requestDto);
     }
@@ -24,7 +30,6 @@ public class ProductController {
     // 관심 상품 조회하기
     @GetMapping("/products")
     public List<ProductResponseDto> getProducts() throws SQLException {
-        ProductService productService = new ProductService();
         // 응답 보내기
         return productService.getProducts();
     }
@@ -32,7 +37,6 @@ public class ProductController {
     // 관심 상품 최저가 등록하기
     @PutMapping("/products/{id}")
     public Long updateProduct(@PathVariable Long id, @RequestBody ProductMypriceRequestDto requestDto) throws SQLException {
-        ProductService productService = new ProductService();
         // 응답 보내기 (업데이트된 상품 id)
         return productService.updateProduct(id, requestDto);
     }
