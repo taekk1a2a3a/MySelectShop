@@ -2,8 +2,10 @@ package com.sparta.myselectshop.controller;
 
 import com.sparta.myselectshop.dto.FolderRequestDto;
 import com.sparta.myselectshop.entity.Folder;
+import com.sparta.myselectshop.entity.Product;
 import com.sparta.myselectshop.service.FolderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,5 +37,24 @@ public class FolderController {
         return folderService.getFolders(request);
     }
 
+    // 회원이 등록한 폴더 내 모든 상품 조회
+    @GetMapping("/folders/{folderId}/products")
+    public Page<Product> getProductsInFolder(
+            @PathVariable Long folderId,
+            @RequestParam int page,
+            @RequestParam int size,
+            @RequestParam String sortBy,
+            @RequestParam boolean isAsc,
+            HttpServletRequest request
+    ) {
+        return folderService.getProductsInFolder(
+                folderId,
+                page-1,
+                size,
+                sortBy,
+                isAsc,
+                request
+        );
+    }
 
 }
