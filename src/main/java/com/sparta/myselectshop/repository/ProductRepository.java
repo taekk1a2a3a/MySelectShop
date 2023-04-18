@@ -3,19 +3,29 @@ package com.sparta.myselectshop.repository;
 import com.sparta.myselectshop.dto.ProductMypriceRequestDto;
 import com.sparta.myselectshop.dto.ProductResponseDto;
 import com.sparta.myselectshop.entity.Product;
-import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class ProductRepository {
+// ProductRepository 에는 어노테이션을 달지 않고 순수한 Java Class 인데 이걸 BeanConfiguration 클래스에서 ProductRepository 를 반환하는
+// 함수를 빈으로 등록해서 사용한다.
+public class ProductRepository{
+
+    private final String dbUrl;
+    private final String username;
+    private final String password;
+
+    public ProductRepository(String dbUrl, String username, String password) {
+        this.dbUrl = dbUrl;
+        this.username = username;
+        this.password = password;
+    }
 
     public ProductResponseDto createProduct(Product product) throws SQLException {
 
         // DB 연결
-        Connection connection = DriverManager.getConnection("jdbc:h2:mem:db", "sa", "");
+        Connection connection = getConnection();
 
         // DB Query 작성
         PreparedStatement ps = connection.prepareStatement("select max(id) as id from product");
@@ -50,7 +60,7 @@ public class ProductRepository {
         List<ProductResponseDto> products = new ArrayList<>();
 
         // DB 연결
-        Connection connection = DriverManager.getConnection("jdbc:h2:mem:db", "sa", "");
+        Connection connection = getConnection();
 
         // DB Query 작성 및 실행
         Statement stmt = connection.createStatement();
@@ -78,7 +88,7 @@ public class ProductRepository {
     public Long updateProduct(Long id, ProductMypriceRequestDto requestDto) throws SQLException {
 
         // DB 연결
-        Connection connection = DriverManager.getConnection("jdbc:h2:mem:db", "sa", "");
+        Connection connection = getConnection();
 
         // DB Query 작성
         PreparedStatement ps = connection.prepareStatement("update product set myprice = ? where id = ?");
@@ -99,7 +109,7 @@ public class ProductRepository {
         Product product = new Product();
 
         // DB 연결
-        Connection connection = DriverManager.getConnection("jdbc:h2:mem:db", "sa", "");
+        Connection connection = getConnection();
 
         // DB Query 작성
         PreparedStatement ps = connection.prepareStatement("select * from product where id = ?");
@@ -122,6 +132,10 @@ public class ProductRepository {
         connection.close();
 
         return product;
+    }
+
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(dbUrl, username, password);
     }
 
 }

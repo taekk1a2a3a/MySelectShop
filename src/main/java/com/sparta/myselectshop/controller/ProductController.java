@@ -4,6 +4,7 @@ import com.sparta.myselectshop.dto.ProductMypriceRequestDto;
 import com.sparta.myselectshop.dto.ProductRequestDto;
 import com.sparta.myselectshop.dto.ProductResponseDto;
 import com.sparta.myselectshop.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
@@ -13,11 +14,11 @@ import java.util.List;
 @RequestMapping("/api")
 public class ProductController {
 
-    // 멤버 변수 선언 (객체 중복 생성 코드 정리)
     private final ProductService productService;
 
-    public ProductController() {
-        this.productService =  new ProductService();
+    @Autowired
+    public ProductController(ProductService productService) {
+        this.productService =  productService;
     }
 
     // 관심 상품 등록하기

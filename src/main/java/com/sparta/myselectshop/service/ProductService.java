@@ -5,6 +5,7 @@ import com.sparta.myselectshop.dto.ProductRequestDto;
 import com.sparta.myselectshop.dto.ProductResponseDto;
 import com.sparta.myselectshop.entity.Product;
 import com.sparta.myselectshop.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
@@ -12,11 +13,12 @@ import java.util.List;
 
 @Component
 public class ProductService {
-    // 멤버 변수 선언 (객체 중복 생성 코드 정리)
+
     private final ProductRepository productRepository;
 
-    public ProductService() {
-        this.productRepository = new ProductRepository();
+    @Autowired
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
     public ProductResponseDto createProduct(ProductRequestDto requestDto) throws SQLException {
